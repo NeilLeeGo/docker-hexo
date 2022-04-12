@@ -1,0 +1,30 @@
+FROM ubuntu
+MAINTAINER Neil
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Taipei
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt update
+RUN apt --yes install git
+RUN apt --yes install curl dirmngr apt-transport-https lsb-release ca-certificates
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt update
+RUN apt --yes install nodejs 
+
+RUN npm install hexo-cli -g
+
+#RUN hexo init blog
+
+
+ARG NAME=docker
+ARG PASSWD=docker
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID -o $NAME
+RUN useradd -m -u $UID -g $GID -o -s /bin/bash $NAME
+RUN usermod -a -G sudo $NAME
+RUN echo "root:$PASSWD" | chpasswd
+RUN echo "$NAME:$PASSWD" | chpasswd
+USER $NAME
+WORKDIR /home/$NAME/Hexo

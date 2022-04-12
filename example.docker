@@ -1,0 +1,33 @@
+FROM ubuntu
+MAINTAINER Neil
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Taipei
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+RUN apt-get update
+RUN apt-get --yes install git
+RUN apt-get --yes install curl dirmngr apt-transport-https lsb-release ca-certificates
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get update
+RUN apt-get --yes install nodejs 
+
+RUN npm install hexo-cli -g
+
+ARG UNAME=docker
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID -o $UNAME
+RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
+USER $UNAME
+
+RUN cd /home/$UNAME/
+RUN mkdir /home/$UNAME/Hexo
+RUN ls /home/$UNAME
+RUN cd home/$UNAME/Hexo
+CMD /bin/bash
+
+#RUN hexo init home/$UNAME/Hexo/blog
+# docker build --progress=plain --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t hexo -f hexo.docker ./
+# docker run --net=host -it -v /home/neil/Workspace/Hexo:/home/docker/Hexo hexo /bin/bash
+
